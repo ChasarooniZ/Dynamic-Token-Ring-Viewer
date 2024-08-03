@@ -4,16 +4,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Processor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        p {
+            color: #555;
+            margin-bottom: 20px;
+        }
+        .file-input {
+            margin-bottom: 15px;
+        }
+        input[type="file"] {
+            display: block;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
     <h1>Dynamic Token Sheet Maker</h1>
-    These Images must be 2048 x 2048
+    <p>These Images must be 2048 x 2048</p>
 
-    Token Border
-    <input type="file" id="image1" accept="image/*">
-    Token Background
-    <input type="file" id="image2" accept="image/*">
+    <div class="file-input">
+        <label for="image1">Token Border</label>
+        <input type="file" id="image1" accept="image/*">
+    </div>
+    
+    <div class="file-input">
+        <label for="image2">Token Background</label>
+        <input type="file" id="image2" accept="image/*">
+    </div>
+    
     <button id="processButton">Process Images into a token sheet</button>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="script.js"></script>
 </body>
