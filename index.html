@@ -3,20 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Editor</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Image Processor</title>
 </head>
 <body>
-    <div id="container">
-        <input type="file" id="upload" accept="image/*">
-        <div id="editor">
-            <canvas id="canvas"></canvas>
-            <div id="json-editor">
-                <textarea id="json-input" rows="20" cols="30"></textarea>
-                <button id="update-json">Update</button>
-            </div>
-        </div>
-    </div>
-    <script src="scripts.js"></script>
+    <h1>Image Processor</h1>
+    <input type="file" id="image1" accept="image/*">
+    <input type="file" id="image2" accept="image/*">
+    <button id="processButton">Process Images</button>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
