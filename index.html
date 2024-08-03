@@ -43,6 +43,19 @@
         button:hover {
             background-color: #0056b3;
         }
+        .preview {
+            margin-bottom: 20px;
+        }
+        .preview img {
+            max-width: 100px;
+            margin-right: 10px;
+        }
+        #loadingIndicator {
+            display: none;
+            margin-top: 20px;
+            font-size: 16px;
+            color: #007bff;
+        }
     </style>
 </head>
 <body>
@@ -52,14 +65,17 @@
     <div class="file-input">
         <label for="image1">Token Border</label>
         <input type="file" id="image1" accept="image/*">
+        <div class="preview" id="preview1"></div>
     </div>
     
     <div class="file-input">
         <label for="image2">Token Background</label>
         <input type="file" id="image2" accept="image/*">
+        <div class="preview" id="preview2"></div>
     </div>
     
     <button id="processButton">Process Images into a token sheet</button>
+    <div id="loadingIndicator">Processing...</div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="script.js"></script>
