@@ -1,3 +1,5 @@
+document.getElementById('image1').addEventListener('change', () => showPreview('image1', 'preview1'));
+document.getElementById('image2').addEventListener('change', () => showPreview('image2', 'preview2'));
 document.getElementById('processButton').addEventListener('click', processImages);
 
 async function processImages() {
@@ -9,12 +11,14 @@ async function processImages() {
         return;
     }
 
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    loadingIndicator.style.display = 'block';
+
     const image1 = await loadImage(image1File);
     const image2 = await loadImage(image2File);
 
     let images = [image1, image2];
     const collections = [];
-		const res = [2048, 1024,]
 
     while (images[0].width >= 256) {
         const appendedImage = appendImages(images[0], images[1]);
@@ -24,13 +28,13 @@ async function processImages() {
         images = images.concat(images); // Append two copies
     }
 
-    let finale = collections[0]
-    // Export the collections as WebP
+    let finale = collections[0];
     for (let i = 1; i < collections.length; i++) {
-        finale = appendImages(finale, collections[i])
+        finale = appendImages(finale, collections[i]);
     }
     await exportAsWebP(finale, `final_ring.webp`);
 
+    loadingIndicator.style.display = 'none';
     alert('Processing and export complete!');
 }
 
@@ -73,4 +77,20 @@ function exportAsWebP(canvas, filename) {
             resolve();
         }, 'image/webp');
     });
+}
+
+function showPreview(inputId, previewId) {
+    const input = document.getElementById(inputId);
+    const preview = document.getElementById(previewId);
+    preview.innerHTML = '';
+    const file = input.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            preview.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+    }
 }
