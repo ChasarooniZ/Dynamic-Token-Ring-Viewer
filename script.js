@@ -1,141 +1,76 @@
-document.getElementById('upload').addEventListener('change', handleImageUpload);
-document.getElementById('update-json').addEventListener('click', updateVisualization);
+document.getElementById('processButton').addEventListener('click', processImages);
 
-let canvas = document.getElementById('canvas');
-let ctx = canvas.getContext('2d');
-let img = new Image();
-let jsonData = {
+async function processImages() {
+    const image1File = document.getElementById('image1').files[0];
+    const image2File = document.getElementById('image2').files[0];
 
-	"config": {
-		"defaultColorBand": {
-			"startRadius": 0.59,
-			"endRadius": 0.7225
-		}
-	},
+    if (!image1File || !image2File) {
+        alert('Please upload both images.');
+        return;
+    }
 
-	"frames": {
+    const image1 = await loadImage(image1File);
+    const image2 = await loadImage(image2File);
 
-		"token-ring-gargantuan-bkg":
-		{
-			"frame": {"x":0,"y":0,"w":2048,"h":2048},
-			"rotated": false,
-			"trimmed": false,
-			"spriteSourceSize": {"x":0,"y":0,"w":2048,"h":2048},
-			"sourceSize": {"w":2048,"h":2048},
-			"anchor": {"x":0.5,"y":0.5}
-		},
-		"token-ring-gargantuan":
-		{
-			"frame": {"x":2048,"y":0,"w":2048,"h":2048},
-			"rotated": false,
-			"trimmed": false,
-			"spriteSourceSize": {"x":0,"y":0,"w":2048,"h":2048},
-			"sourceSize": {"w":2048,"h":2048},
-			"anchor": {"x":0.5,"y":0.5},
-			"gridTarget": 3
-		},
-		"token-ring-large-huge-bkg":
-		{
-			"frame": {"x":0,"y":2048,"w":1024,"h":1024},
-			"rotated": false,
-			"trimmed": false,
-			"spriteSourceSize": {"x":0,"y":0,"w":1024,"h":1024},
-			"sourceSize": {"w":1024,"h":1024},
-			"anchor": {"x":0.5,"y":0.5}
-		},
-		"token-ring-large-huge":
-		{
-			"frame": {"x":1024,"y":2048,"w":1024,"h":1024},
-			"rotated": false,
-			"trimmed": false,
-			"spriteSourceSize": {"x":0,"y":0,"w":1024,"h":1024},
-			"sourceSize": {"w":1024,"h":1024},
-			"anchor": {"x":0.5,"y":0.5},
-			"gridTarget": 2
-		},
-		"token-ring-med-bkg":
-		{
-			"frame": {"x":2048,"y":2048,"w":512,"h":512},
-			"rotated": false,
-			"trimmed": false,
-			"spriteSourceSize": {"x":0,"y":0,"w":512,"h":512},
-			"sourceSize": {"w":512,"h":512},
-			"anchor": {"x":0.5,"y":0.5}
-		},
-		"token-ring-med":
-		{
-			"frame": {"x":2560,"y":2048,"w":512,"h":512},
-			"rotated": false,
-			"trimmed": false,
-			"spriteSourceSize": {"x":0,"y":0,"w":512,"h":512},
-			"sourceSize": {"w":512,"h":512},
-			"anchor": {"x":0.5,"y":0.5},
-			"gridTarget": 1
-		},
-		"token-ring-tiny-bkg":
-		{
-			"frame": {"x":3072,"y":2048,"w":256,"h":256},
-			"rotated": false,
-			"trimmed": false,
-			"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
-			"sourceSize": {"w":256,"h":256},
-			"anchor": {"x":0.5,"y":0.5}
-		},
-		"token-ring-tiny":
-		{
-			"frame": {"x":3328,"y":2048,"w":256,"h":256},
-			"rotated": false,
-			"trimmed": false,
-			"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
-			"sourceSize": {"w":256,"h":256},
-			"anchor": {"x":0.5,"y":0.5},
-			"gridTarget": 0.5
-		}},
-	"meta": {
-		"app": "https://www.codeandweb.com/texturepacker",
-		"version": "1.1",
-		"image": "rings-steel.webp",
-		"format": "RGBA8888",
-		"size": {"w":4096,"h":4096},
-		"scale": "1",
-		"smartupdate": "$TexturePacker:SmartUpdate:496ccb17f5931d97cd7c0c3a3e12d174:df2ec9802471032573442880ef1b4096:ec3138cf13d5faeeb3b426f1b12635be$"
-	}
-};
+    let images = [image1, image2];
+    const collections = [];
+		const res = [2048, 1024,]
 
-document.getElementById('json-input').value = JSON.stringify(jsonData, null, 2);
+    while (images[0].width >= 256) {
+        const appendedImage = appendImages(images[0], images[1]);
+        collections.push(appendedImage);
 
-function handleImageUpload(event) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        img.src = e.target.result;
-        img.onload = function() {
-            canvas.width = img.width;
-            canvas.height = img.height;
-            ctx.drawImage(img, 0, 0);
-            drawVisualization();
+        images = images.map(img => shrinkImage(img));
+        images = images.concat(images); // Append two copies
+    }
+
+    let finale = collections[0]
+    // Export the collections as WebP
+    for (let i = 1; i < collections.length; i++) {
+        finale = appendImages(finale, collections[i])
+    }
+    await exportAsWebP(finale, `final_ring.webp`);
+
+    alert('Processing and export complete!');
+}
+
+function loadImage(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => resolve(img);
+            img.src = e.target.result;
         };
-    };
-    reader.readAsDataURL(event.target.files[0]);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
 }
 
-function drawVisualization() {
-    ctx.drawImage(img, 0, 0);
-    // Draw frames
-    for (const key in jsonData.frames) {
-        if (jsonData.frames.hasOwnProperty(key)) {
-            const frame = jsonData.frames[key].frame;
-            ctx.strokeStyle = 'yellow';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(frame.x, frame.y, frame.w, frame.h);
-        }
-    }
+function appendImages(image1, image2) {
+    const canvas = document.createElement('canvas');
+    canvas.width = image1.width + image2.width;
+    canvas.height = image1.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(image1, 0, 0);
+    ctx.drawImage(image2, image1.width, 0);
+    return canvas;
 }
 
-function updateVisualization() {
-    try {
-        jsonData = JSON.parse(document.getElementById('json-input').value);
-        drawVisualization();
-    } catch (e) {
-        alert('Invalid JSON');
-    }
+function shrinkImage(image) {
+    const canvas = document.createElement('canvas');
+    canvas.width = image.width / 2;
+    canvas.height = image.height / 2;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+    return canvas;
+}
+
+function exportAsWebP(canvas, filename) {
+    return new Promise((resolve) => {
+        canvas.toBlob((blob) => {
+            saveAs(blob, filename);
+            resolve();
+        }, 'image/webp');
+    });
 }
