@@ -17,7 +17,7 @@ async function processImages() {
     const image1 = await loadImage(image1File);
     const image2 = await loadImage(image2File);
 
-    let images = [image1, image2];
+    let images = [image2, image1];
     const collections = [];
 
     while (images[0].width >= 256) {
